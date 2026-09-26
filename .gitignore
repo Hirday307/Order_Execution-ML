@@ -1,0 +1,23 @@
+# Market data licenses forbid redistribution: never commit data
+data/
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.egg-info/
+.pytest_cache/
+.ipynb_checkpoints/
+models/
+.DS_Store
+.env
+
+# Results: keep only the small generated summaries, never order-level output
+results/*
+!results/.gitkeep
+!results/*/
+results/*/*
+!results/*/summary.md
+!results/*/scoring_log.csv
+!results/*/chosen_params.json
+# Synthetic dry runs test plumbing only; their numbers must never look like results
+results/synthetic/

@@ -1,0 +1,72 @@
+# Stage 1: build and debug on the LOBSTER free sample (one day, five stocks).
+# One day is a demonstration, not evidence.
+stage: stage1
+source: lobster
+raw_dir: data/raw
+processed_dir: data/processed/stage1
+models_dir: models/stage1
+results_dir: results/stage1
+symbols: [AAPL, AMZN, GOOG, INTC, MSFT]
+report_note: "Stage 1: one day of 2012 Nasdaq data (LOBSTER sample). A demonstration, not evidence; intervals from a single day are wide."
+levels: 10
+tick_size: 0.01
+
+split:
+  mode: intraday
+  train: ["09:45", "12:30"]
+  validate: ["12:40", "14:00"]
+  test: ["14:10", "16:00"]
+  leave_one_stock_out: true   # extra check: train and tune on four stocks, test on the fifth
+
+label:
+  horizon_s: 30               # main horizon
+  horizons: [10, 30, 60]      # labels and models built for each; the choice is made on validation
+
+# Proxy: recent consolidated Yahoo volume, NOT 2012 Nasdaq volume (scripts/fetch_volume_curve.py)
+volume_curve:
+  source: proxy_csv
+  path: data/processed/volume_curve_proxy_{symbol}.csv
+
+orders:
+  horizon_min: 30
+  slice_s: 30
+  every_min: 5
+  targets: [0.02, 0.05, 0.10]
+
+execution:
+  band: 0.10
+  catchup_threshold: 0.10
+
+# Taker: the Reg NMS access-fee cap in 2012. Rebate: a rough typical value.
+fees:
+  taker_per_share: 0.0030
+  maker_rebate_per_share: 0.0020
+
+impact:
+  none:   {Y: 0.0, half_life_s: 300}
+  medium: {Y: 0.5, half_life_s: 300}
+  strong: {Y: 1.0, half_life_s: 600}
+
+fill_modes: [conservative, optimistic]
+
+model:
+  ridge_alpha: 10.0
+  clip_pct: [0.5, 99.5]
+  xgboost: {}
+
+tuning:
+  impact: medium
+  fill_mode: conservative
+  ac_kappa_T: [0.5, 1, 2, 4]
+  heuristic_theta: [0.3, 0.5, 0.7]
+  alpha: [0.25, 0.5]
+  ml_m: [0.25, 0.5, 1, 2]
+  models: [ridge, xgboost]
+  horizons: [10, 30, 60]
+
+n_jobs: -1                    # parallel workers for the backtest (one order book replay each)
+
+bootstrap:
+  block: 15min          # orders overlapping in time are not independent
+  n_boot: 2000
+  seed: 0

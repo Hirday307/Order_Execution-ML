@@ -1,0 +1,72 @@
+# Stage 2: multi-day walk-forward on Databento Nasdaq TotalView-ITCH (mbp-10).
+stage: stage2
+source: databento
+raw_dir: data/raw/databento
+processed_dir: data/processed/stage2
+models_dir: models/stage2
+results_dir: results/stage2
+symbols: [MSFT]
+levels: 10
+tick_size: 0.01
+
+download:
+  dataset: XNAS.ITCH
+  schema: mbp-10
+  start: "2026-03-02"      # first trading day (inclusive)
+  end: "2026-03-27"        # last trading day (inclusive); ~20 trading days
+
+split:
+  mode: walk_forward
+  session: ["09:45", "16:00"]
+  train_days: 10
+
+label:
+  horizon_s: 30               # main horizon
+  horizons: [10, 30, 60]      # labels and models built for each; the choice is made on validation
+
+volume_curve:
+  source: past_days
+
+orders:
+  horizon_min: 30
+  slice_s: 30
+  every_min: 5
+  targets: [0.02, 0.05, 0.10]
+
+execution:
+  band: 0.10
+  catchup_threshold: 0.10
+
+# Set these from Nasdaq's published fee schedule for the period you download.
+fees:
+  taker_per_share: 0.0030
+  maker_rebate_per_share: 0.0020
+
+impact:
+  none:   {Y: 0.0, half_life_s: 300}
+  medium: {Y: 0.5, half_life_s: 300}
+  strong: {Y: 1.0, half_life_s: 600}
+
+fill_modes: [conservative, optimistic]
+
+model:
+  ridge_alpha: 10.0
+  clip_pct: [0.5, 99.5]
+  xgboost: {}
+
+tuning:
+  impact: medium
+  fill_mode: conservative
+  ac_kappa_T: [0.5, 1, 2, 4]
+  heuristic_theta: [0.3, 0.5, 0.7]
+  alpha: [0.25, 0.5]
+  ml_m: [0.25, 0.5, 1, 2]
+  models: [ridge, xgboost]
+  horizons: [10, 30, 60]
+
+n_jobs: -1                    # parallel workers for the backtest (one order book replay each)
+
+bootstrap:
+  block: day
+  n_boot: 2000
+  seed: 0

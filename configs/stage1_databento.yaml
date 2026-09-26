@@ -1,0 +1,81 @@
+# Stage 1 on ONE recent Databento day instead of the LOBSTER sample, for when the
+# LOBSTER sample request is pending or refused. Same design; the day is kept
+# outside the Stage 2 range so Stage 2's test days stay unseen.
+# One day is a demonstration, not evidence.
+stage: stage1_databento
+readme_block: stage1          # fills the README's Stage 1 results block
+source: databento
+raw_dir: data/raw/databento
+processed_dir: data/processed/stage1_databento
+models_dir: models/stage1_databento
+results_dir: results/stage1_databento
+symbols: [AAPL, AMZN, GOOG, INTC, MSFT]
+report_note: "Stage 1: one recent day of Nasdaq data (Databento). A demonstration, not evidence; intervals from a single day are wide."
+levels: 10
+tick_size: 0.01
+
+download:
+  dataset: XNAS.ITCH
+  schema: mbp-10
+  start: "2026-02-27"
+  end: "2026-02-27"
+
+split:
+  mode: intraday
+  train: ["09:45", "12:30"]
+  validate: ["12:40", "14:00"]
+  test: ["14:10", "16:00"]
+  leave_one_stock_out: true   # extra check: train and tune on four stocks, test on the fifth
+
+label:
+  horizon_s: 30               # main horizon
+  horizons: [10, 30, 60]      # labels and models built for each; the choice is made on validation
+
+# Proxy: consolidated Yahoo volume from the last 60 days (scripts/fetch_volume_curve.py)
+volume_curve:
+  source: proxy_csv
+  path: data/processed/volume_curve_proxy_{symbol}.csv
+
+orders:
+  horizon_min: 30
+  slice_s: 30
+  every_min: 5
+  targets: [0.02, 0.05, 0.10]
+
+execution:
+  band: 0.10
+  catchup_threshold: 0.10
+
+# Set these from Nasdaq's published fee schedule for the day you download.
+fees:
+  taker_per_share: 0.0030
+  maker_rebate_per_share: 0.0020
+
+impact:
+  none:   {Y: 0.0, half_life_s: 300}
+  medium: {Y: 0.5, half_life_s: 300}
+  strong: {Y: 1.0, half_life_s: 600}
+
+fill_modes: [conservative, optimistic]
+
+model:
+  ridge_alpha: 10.0
+  clip_pct: [0.5, 99.5]
+  xgboost: {}
+
+tuning:
+  impact: medium
+  fill_mode: conservative
+  ac_kappa_T: [0.5, 1, 2, 4]
+  heuristic_theta: [0.3, 0.5, 0.7]
+  alpha: [0.25, 0.5]
+  ml_m: [0.25, 0.5, 1, 2]
+  models: [ridge, xgboost]
+  horizons: [10, 30, 60]
+
+n_jobs: -1                    # parallel workers for the backtest (one order book replay each)
+
+bootstrap:
+  block: 15min          # orders overlapping in time are not independent
+  n_boot: 2000
+  seed: 0

@@ -56,6 +56,9 @@ def small_multiples(n: int, ncols: int = 3, panel=(3.4, 2.3), sharex=True, share
     flat = list(axes.ravel())
     for ax in flat[n:]:
         ax.remove()
+    for i, ax in enumerate(flat[:n]):         # bottom panel of each column shows the x ticks
+        if i + ncols >= n:
+            ax.xaxis.set_tick_params(labelbottom=True)
     return fig, flat[:n]
 
 

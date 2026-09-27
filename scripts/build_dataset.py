@@ -9,6 +9,7 @@ import numpy as np
 import pandas as pd
 
 from adaptive_exec.features import build_raw_features
+from adaptive_exec.itch import find_itch_days, itch_to_events
 from adaptive_exec.labels import forward_move_bps
 from adaptive_exec.loaders import FILL_REMOVAL, find_lobster_files, load_databento, load_lobster
 from adaptive_exec.model import label_column, save_json
@@ -28,6 +29,9 @@ def raw_days(cfg, symbol):
             date = path.name.split("_")[1].split(".")[0]
             if lo <= date <= hi:
                 yield date, lambda p=path: load_databento(p, cfg["levels"])
+    elif cfg["source"] == "itch":
+        for date, npz in find_itch_days(cfg["raw_dir"], symbol):
+            yield date, lambda p=npz, d=date: itch_to_events(p, d, cfg["levels"])
     else:
         raise ValueError(f"unknown source {cfg['source']}")
 

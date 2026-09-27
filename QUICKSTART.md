@@ -84,7 +84,11 @@ where = ["src"]
 2. Download the 10-level sample for AAPL, AMZN, GOOG, INTC and MSFT (21 June 2012).
 3. Unzip into `data/raw/`. Each stock has a message file and an order book file, named like `MSFT_2012-06-21_34200000_57600000_message_10.csv` and `MSFT_2012-06-21_34200000_57600000_orderbook_10.csv`, plus a readme. Read the readme, since it defines every column.
 
-If the request is slow or refused, run Stage 1 on one recent Databento day instead: `configs/stage1_databento.yaml` has the same design, with its day kept outside the Stage 2 range. Download it with `python scripts/download_databento.py --config configs/stage1_databento.yaml` (cost estimate first; nothing downloads without `--confirm`).
+If the request is slow or refused, there are two other routes to Stage 1 data.
+
+**Nasdaq's public ITCH sample.** Nasdaq publishes full-day TotalView-ITCH 5.0 sample files, the raw feed LOBSTER is built from, at `https://emi.nasdaq.com/ITCH/Nasdaq ITCH/`. `configs/stage1_itch.yaml` uses 27 March 2019, an ordinary Wednesday with no Fed decision and no earnings for the five stocks (avoid 30 January and 30 October 2019: the 2 pm Fed announcement falls between the validation and test windows). Download `03272019.NASDAQ_ITCH50.gz` (5.5 GB) into `data/raw/itch/`, then run `python scripts/extract_itch.py --config configs/stage1_itch.yaml`. It streams the file once (about 12 GB uncompressed, so it never loads it whole) and keeps the five stocks' order messages; `build_dataset.py` then rebuilds each book order by order.
+
+**One Databento day:** `configs/stage1_databento.yaml` has the same design, with its day kept outside the Stage 2 range. Download it with `python scripts/download_databento.py --config configs/stage1_databento.yaml` (cost estimate first; nothing downloads without `--confirm`).
 
 ### Proxy volume curve (Stage 1 only)
 

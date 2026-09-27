@@ -62,11 +62,11 @@ class MarketReplay:
         valid = events["valid"].to_numpy()
         self.levels = levels
         self.v_ns = ns[valid]
-        v = events[valid]
-        self.bid_px = v[[f"bid_px_{i}" for i in range(1, levels + 1)]].to_numpy()
-        self.bid_sz = v[[f"bid_sz_{i}" for i in range(1, levels + 1)]].to_numpy()
-        self.ask_px = v[[f"ask_px_{i}" for i in range(1, levels + 1)]].to_numpy()
-        self.ask_sz = v[[f"ask_sz_{i}" for i in range(1, levels + 1)]].to_numpy()
+        rng = range(1, levels + 1)
+        self.bid_px = events[[f"bid_px_{i}" for i in rng]].to_numpy()[valid]
+        self.bid_sz = events[[f"bid_sz_{i}" for i in rng]].to_numpy()[valid]
+        self.ask_px = events[[f"ask_px_{i}" for i in rng]].to_numpy()[valid]
+        self.ask_sz = events[[f"ask_sz_{i}" for i in rng]].to_numpy()[valid]
         self.mid = (self.bid_px[:, 0] + self.ask_px[:, 0]) / 2
 
         pos = np.arange(len(events))

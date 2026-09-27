@@ -32,6 +32,21 @@ def book_columns(levels: int) -> list[str]:
             for side, kind in (("ask", "px"), ("ask", "sz"), ("bid", "px"), ("bid", "sz"))]
 
 
+def classify_hidden_trades(df: pd.DataFrame) -> pd.DataFrame:
+    """Quote rule for hidden executions (type 5): above the mid buyer-initiated,
+    below seller-initiated, at the mid unknown (0). The feed's side flag for these
+    trades is not informative (Nasdaq ITCH 5.0 sets it to 'B' on every one).
+    Hidden orders are not in the displayed book, so the row's book is the one
+    the trade met."""
+    hidden = df["type"].to_numpy() == 5
+    if hidden.any():
+        mid = (df["bid_px_1"].to_numpy() + df["ask_px_1"].to_numpy()) / 2
+        sign = np.nan_to_num(np.sign(np.round(df["price"].to_numpy() - mid, 6))).astype(int)
+        df.loc[hidden, "aggressor"] = sign[hidden]
+        df.loc[hidden, "order_side"] = -sign[hidden]
+    return df
+
+
 def _finish(df: pd.DataFrame, levels: int) -> pd.DataFrame:
     df["mid"] = (df["ask_px_1"] + df["bid_px_1"]) / 2
     df["spread"] = df["ask_px_1"] - df["bid_px_1"]
@@ -66,7 +81,7 @@ def lobster_to_events(msg: pd.DataFrame, book: pd.DataFrame, date: str,
     # LOBSTER's direction is the side of the RESTING order that was hit
     df["aggressor"] = np.where(df["is_trade"], -df["direction"], 0).astype(int)
     df["order_side"] = df["direction"].astype(int)
-    return _finish(df, levels)
+    return _finish(classify_hidden_trades(df), levels)
 
 
 def load_lobster(msg_path, book_path, date: str, levels: int = 10) -> pd.DataFrame:

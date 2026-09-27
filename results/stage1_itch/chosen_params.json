@@ -1,0 +1,212 @@
+{
+  "AAPL_2019-03-27": {
+    "TWAP": {},
+    "VWAP": {},
+    "Almgren-Chriss": {
+      "kappa_T": 1
+    },
+    "Heuristic adaptive": {
+      "alpha": 0.25,
+      "theta": 0.5
+    },
+    "ML adaptive (tactic only)": {
+      "alpha": 0.0,
+      "m": 0.5,
+      "model": "ridge_30s"
+    },
+    "ML adaptive (tactic + speed)": {
+      "alpha": 0.5,
+      "m": 0.25,
+      "model": "ridge_60s"
+    }
+  },
+  "LOSO_AMZN_2019-03-27": {
+    "TWAP": {},
+    "VWAP": {},
+    "Almgren-Chriss": {
+      "kappa_T": 2
+    },
+    "Heuristic adaptive": {
+      "alpha": 0.5,
+      "theta": 0.7
+    },
+    "ML adaptive (tactic only)": {
+      "alpha": 0.0,
+      "m": 0.25,
+      "model": "xgboost_60s"
+    },
+    "ML adaptive (tactic + speed)": {
+      "alpha": 0.25,
+      "m": 0.5,
+      "model": "xgboost_60s"
+    }
+  },
+  "LOSO_GOOG_2019-03-27": {
+    "TWAP": {},
+    "VWAP": {},
+    "Almgren-Chriss": {
+      "kappa_T": 2
+    },
+    "Heuristic adaptive": {
+      "alpha": 0.5,
+      "theta": 0.7
+    },
+    "ML adaptive (tactic only)": {
+      "alpha": 0.0,
+      "m": 0.5,
+      "model": "ridge_60s"
+    },
+    "ML adaptive (tactic + speed)": {
+      "alpha": 0.25,
+      "m": 0.5,
+      "model": "xgboost_30s"
+    }
+  },
+  "LOSO_INTC_2019-03-27": {
+    "TWAP": {},
+    "VWAP": {},
+    "Almgren-Chriss": {
+      "kappa_T": 2
+    },
+    "Heuristic adaptive": {
+      "alpha": 0.5,
+      "theta": 0.7
+    },
+    "ML adaptive (tactic only)": {
+      "alpha": 0.0,
+      "m": 0.5,
+      "model": "xgboost_60s"
+    },
+    "ML adaptive (tactic + speed)": {
+      "alpha": 0.5,
+      "m": 0.25,
+      "model": "xgboost_60s"
+    }
+  },
+  "LOSO_MSFT_2019-03-27": {
+    "TWAP": {},
+    "VWAP": {},
+    "Almgren-Chriss": {
+      "kappa_T": 2
+    },
+    "Heuristic adaptive": {
+      "alpha": 0.5,
+      "theta": 0.7
+    },
+    "ML adaptive (tactic only)": {
+      "alpha": 0.0,
+      "m": 1,
+      "model": "xgboost_60s"
+    },
+    "ML adaptive (tactic + speed)": {
+      "alpha": 0.5,
+      "m": 0.25,
+      "model": "xgboost_60s"
+    }
+  },
+  "AMZN_2019-03-27": {
+    "TWAP": {},
+    "VWAP": {},
+    "Almgren-Chriss": {
+      "kappa_T": 2
+    },
+    "Heuristic adaptive": {
+      "alpha": 0.25,
+      "theta": 0.7
+    },
+    "ML adaptive (tactic only)": {
+      "alpha": 0.0,
+      "m": 0.25,
+      "model": "xgboost_60s"
+    },
+    "ML adaptive (tactic + speed)": {
+      "alpha": 0.5,
+      "m": 0.25,
+      "model": "xgboost_60s"
+    }
+  },
+  "LOSO_AAPL_2019-03-27": {
+    "TWAP": {},
+    "VWAP": {},
+    "Almgren-Chriss": {
+      "kappa_T": 2
+    },
+    "Heuristic adaptive": {
+      "alpha": 0.5,
+      "theta": 0.7
+    },
+    "ML adaptive (tactic only)": {
+      "alpha": 0.0,
+      "m": 0.25,
+      "model": "xgboost_60s"
+    },
+    "ML adaptive (tactic + speed)": {
+      "alpha": 0.5,
+      "m": 0.5,
+      "model": "xgboost_60s"
+    }
+  },
+  "GOOG_2019-03-27": {
+    "TWAP": {},
+    "VWAP": {},
+    "Almgren-Chriss": {
+      "kappa_T": 2
+    },
+    "Heuristic adaptive": {
+      "alpha": 0.25,
+      "theta": 0.3
+    },
+    "ML adaptive (tactic only)": {
+      "alpha": 0.0,
+      "m": 0.25,
+      "model": "ridge_60s"
+    },
+    "ML adaptive (tactic + speed)": {
+      "alpha": 0.25,
+      "m": 0.25,
+      "model": "ridge_60s"
+    }
+  },
+  "INTC_2019-03-27": {
+    "TWAP": {},
+    "VWAP": {},
+    "Almgren-Chriss": {
+      "kappa_T": 0.5
+    },
+    "Heuristic adaptive": {
+      "alpha": 0.5,
+      "theta": 0.7
+    },
+    "ML adaptive (tactic only)": {
+      "alpha": 0.0,
+      "m": 0.5,
+      "model": "xgboost_60s"
+    },
+    "ML adaptive (tactic + speed)": {
+      "alpha": 0.25,
+      "m": 0.5,
+      "model": "xgboost_60s"
+    }
+  },
+  "MSFT_2019-03-27": {
+    "TWAP": {},
+    "VWAP": {},
+    "Almgren-Chriss": {
+      "kappa_T": 2
+    },
+    "Heuristic adaptive": {
+      "alpha": 0.5,
+      "theta": 0.5
+    },
+    "ML adaptive (tactic only)": {
+      "alpha": 0.0,
+      "m": 0.5,
+      "model": "ridge_30s"
+    },
+    "ML adaptive (tactic + speed)": {
+      "alpha": 0.25,
+      "m": 0.25,
+      "model": "ridge_30s"
+    }
+  }
+}

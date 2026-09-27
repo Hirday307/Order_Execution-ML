@@ -1,0 +1,76 @@
+# Stage 1 on Nasdaq's public TotalView-ITCH 5.0 sample for 27 March 2019 (an
+# ordinary Wednesday: no Fed decision, no earnings for these five stocks), the
+# raw feed LOBSTER is built from. Used because LOBSTER's samples now need approval.
+# One day is a demonstration, not evidence.
+stage: stage1_itch
+readme_block: stage1          # fills the README's Stage 1 results block
+source: itch
+itch_files: [03272019.NASDAQ_ITCH50.gz]   # Nasdaq's public TotalView-ITCH 5.0 sample day
+raw_dir: data/raw/itch
+processed_dir: data/processed/stage1_itch
+models_dir: models/stage1_itch
+results_dir: results/stage1_itch
+symbols: [AAPL, AMZN, GOOG, INTC, MSFT]
+report_note: "Stage 1: one day (27 March 2019) of Nasdaq TotalView-ITCH data from Nasdaq's public sample file. A demonstration, not evidence; intervals from a single day are wide."
+levels: 10
+tick_size: 0.01
+
+split:
+  mode: intraday
+  train: ["09:45", "12:30"]
+  validate: ["12:40", "14:00"]
+  test: ["14:10", "16:00"]
+  leave_one_stock_out: true   # extra check: train and tune on four stocks, test on the fifth
+
+label:
+  horizon_s: 30               # main horizon
+  horizons: [10, 30, 60]      # labels and models built for each; the choice is made on validation
+
+# Proxy: recent (2026) consolidated Yahoo volume, NOT 2019 Nasdaq volume (scripts/fetch_volume_curve.py)
+volume_curve:
+  source: proxy_csv
+  path: data/processed/volume_curve_proxy_{symbol}.csv
+
+orders:
+  horizon_min: 30
+  slice_s: 30
+  every_min: 5
+  targets: [0.02, 0.05, 0.10]
+
+execution:
+  band: 0.10
+  catchup_threshold: 0.10
+
+# Taker: the Reg NMS access-fee cap. Rebate: a rough typical value for 2019 Nasdaq tiers.
+fees:
+  taker_per_share: 0.0030
+  maker_rebate_per_share: 0.0020
+
+impact:
+  none:   {Y: 0.0, half_life_s: 300}
+  medium: {Y: 0.5, half_life_s: 300}
+  strong: {Y: 1.0, half_life_s: 600}
+
+fill_modes: [conservative, optimistic]
+
+model:
+  ridge_alpha: 10.0
+  clip_pct: [0.5, 99.5]
+  xgboost: {}
+
+tuning:
+  impact: medium
+  fill_mode: conservative
+  ac_kappa_T: [0.5, 1, 2, 4]
+  heuristic_theta: [0.3, 0.5, 0.7]
+  alpha: [0.25, 0.5]
+  ml_m: [0.25, 0.5, 1, 2]
+  models: [ridge, xgboost]
+  horizons: [10, 30, 60]
+
+n_jobs: 2                     # 2019 books are large; keep memory in check on 8 GB machines
+
+bootstrap:
+  block: 15min          # orders overlapping in time are not independent
+  n_boot: 2000
+  seed: 0

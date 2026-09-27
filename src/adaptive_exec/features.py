@@ -66,8 +66,11 @@ def build_raw_features(events: pd.DataFrame, grid: pd.DatetimeIndex | None = Non
     ev_ns = as_ns(events["ts"])
 
     # ---- book state: last VALID (two-sided, uncrossed) book at or before g
-    v = events[events["valid"].to_numpy()]
-    v_ns = ev_ns[events["valid"].to_numpy()]
+    valid = events["valid"].to_numpy()
+    need = ["bid_px_1", "ask_px_1", "bid_sz_1", "ask_sz_1"] + \
+           [f"{s}_sz_{i}" for s in ("bid", "ask") for i in range(1, 6)]
+    v = events.loc[valid, list(dict.fromkeys(need))]
+    v_ns = ev_ns[valid]
     k = _asof_index(v_ns, g)
     bid, ask = v["bid_px_1"].to_numpy(), v["ask_px_1"].to_numpy()
     bsz, asz = v["bid_sz_1"].to_numpy(), v["ask_sz_1"].to_numpy()

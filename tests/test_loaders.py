@@ -70,3 +70,12 @@ def test_databento_cancel_that_removes_a_traded_quantity_is_not_a_cancel():
     ev = databento_to_events(df)
     # same timestamp, same price, resting side -> fill removal (8); others stay cancels (3)
     assert ev["type"].tolist() == [4, 8, 3, 3]
+
+
+def test_lobster_hidden_executions_use_the_quote_rule():
+    msg = pd.DataFrame({"time": [34200.0, 34201.0, 34202.0], "type": [5, 5, 5], "order_id": [0, 0, 0],
+                        "size": [10, 20, 30], "price": [300050, 300100, 300000], "direction": [1, 1, 1]})
+    book = pd.DataFrame([[300100, 100, 300000, 100]] * 3)          # bid 30.00, ask 30.01
+    ev = lobster_to_events(msg, book, "2012-06-21", levels=1)
+    assert ev["aggressor"].tolist() == [0, 1, -1]                  # at mid, at ask, at bid
+    assert ev["is_trade"].all()

@@ -53,11 +53,12 @@ The heuristic is there on purpose: the ML strategy has to beat a simple rule bui
 |---|---|---|---|
 | 1 — build | LOBSTER free sample | One trading day (21 June 2012) of Nasdaq data for AAPL, AMZN, GOOG, INTC and MSFT: every order book event, plus the book up to 10 levels | Building and debugging the pipeline and simulator. One day is a demonstration, not evidence. |
 | 2 — test | Databento `XNAS.ITCH`, schema `mbp-10` | Nasdaq TotalView-ITCH book: top 10 levels on every update, trades included | 10–20 consecutive recent trading days for 1–2 stocks, paid for with the $125 free credit for new accounts. Check the cost before every download. |
+| 1 — build (alternative) | Nasdaq TotalView-ITCH 5.0 public sample | One full day (27 March 2019) of the raw Nasdaq feed that LOBSTER is built from, published by Nasdaq as a sample file | Stage 1 without the LOBSTER sample: `scripts/extract_itch.py` keeps the five stocks' order messages and `build_dataset.py` rebuilds their books order by order (`configs/stage1_itch.yaml`). |
 | Helper | Yahoo Finance (`yfinance`) | 5-minute bars, last 60 days only | A proxy intraday volume curve for Stage 1. It has no quotes, depth or individual trades, so it cannot drive the simulator. |
 
 Both order book sources are **Nasdaq only**; real desks route across many venues (see Limitations). Raw data is never committed to this repository. See `QUICKSTART.md` for download steps.
 
-**LOBSTER sample access (checked September 2026):** the LOBSTER website now serves its samples through a request form (terms, a human check, then a review before download). If the request is slow or refused, Stage 1 runs unchanged on one recent Databento day with `configs/stage1_databento.yaml`.
+**LOBSTER sample access (checked September 2026):** the LOBSTER website now serves its samples through a request form (terms, a human check, then a review before download). If the request is slow or refused, Stage 1 runs unchanged on Nasdaq's public ITCH sample day (`configs/stage1_itch.yaml`) or on one recent Databento day (`configs/stage1_databento.yaml`).
 
 ## How the simulator works
 
@@ -152,6 +153,7 @@ adaptive-execution/
 ├── LICENSE
 ├── configs/
 │   ├── stage1_lobster.yaml
+│   ├── stage1_itch.yaml          # Stage 1 on Nasdaq's public ITCH 5.0 sample day (27 March 2019)
 │   ├── stage1_databento.yaml     # Stage 1 on one Databento day, if the LOBSTER sample is unavailable
 │   ├── stage2_databento.yaml
 │   └── synthetic.yaml            # dry run on synthetic LOBSTER-format files
@@ -165,6 +167,7 @@ adaptive-execution/
 ├── src/adaptive_exec/
 │   ├── __init__.py
 │   ├── loaders.py                # LOBSTER and Databento → one internal format
+│   ├── itch.py                   # Nasdaq ITCH 5.0: stream the raw feed, rebuild each book order by order
 │   ├── features.py               # 18 point-in-time features
 │   ├── labels.py                 # 30 s forward mid-price move
 │   ├── schedules.py              # TWAP, VWAP, Almgren–Chriss, volume curves
@@ -183,6 +186,7 @@ adaptive-execution/
 ├── scripts/
 │   ├── fetch_volume_curve.py     # Stage 1 Yahoo proxy curve
 │   ├── download_databento.py     # Stage 2 download, cost estimate first
+│   ├── extract_itch.py           # pass 1 over an ITCH sample file (keeps the chosen stocks)
 │   ├── make_synthetic_lobster.py
 │   ├── build_dataset.py
 │   ├── train.py
@@ -198,6 +202,7 @@ adaptive-execution/
 │   ├── test_no_lookahead.py
 │   ├── test_loaders.py
 │   ├── test_databento_format.py  # a real DBN file, via Databento's own libraries
+│   ├── test_itch.py              # ITCH parsing and book rebuilding on hand-built messages
 │   ├── test_splits.py
 │   ├── test_pipeline.py
 │   ├── test_model.py
@@ -231,7 +236,9 @@ python scripts/backtest.py           --config $C       # score the test period, 
 python scripts/report.py             --config $C --readme README.md
 ```
 
-The notebooks need Jupyter (`pip install jupyter`) and read `configs/stage1_lobster.yaml` unless the `ADAPTIVE_EXEC_CONFIG` environment variable names another config. `02_signals` needs `train.py`'s output and `03_results` needs the test run.
+The notebooks need Jupyter (`pip install jupyter`) and read `configs/stage1_itch.yaml` unless the `ADAPTIVE_EXEC_CONFIG` environment variable names another config. `02_signals` needs `train.py`'s output and `03_results` needs the test run.
+
+To run Stage 1 on Nasdaq's ITCH sample instead, download `03272019.NASDAQ_ITCH50.gz` (5.5 GB) from Nasdaq's ITCH sample directory (`emi.nasdaq.com/ITCH/Nasdaq ITCH/`) into `data/raw/itch/`, run `python scripts/extract_itch.py --config configs/stage1_itch.yaml`, then the steps above with `C=configs/stage1_itch.yaml`.
 
 For Stage 2, set `DATABENTO_API_KEY`, run `python scripts/download_databento.py --config configs/stage2_databento.yaml` (it prints the cost estimate and downloads nothing without `--confirm`), then the same steps with that config.
 

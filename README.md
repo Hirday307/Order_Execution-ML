@@ -1,4 +1,4 @@
-# Adaptive Execution Engine
+# Adaptive Order Execution Engine
 
 *Can short-term order book signals lower the cost of executing large equity orders? An event-driven replay study against TWAP, VWAP and Almgren–Chriss schedules on Nasdaq limit order book data.*
 

@@ -1,4 +1,4 @@
-# Adaptive Execution Engine — Project Summary
+# Adaptive Order Execution Engine — Project Summary
 
 ## In one paragraph
 

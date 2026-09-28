@@ -1,4 +1,4 @@
-# Adaptive Execution Engine — Build Guide
+# Adaptive Order Execution Engine — Build Guide
 
 A step-by-step plan for a small-scale but industry-faithful execution research project. It uses the same question, benchmark and validation discipline as an electronic trading desk, on free or low-cost Nasdaq order book data.
 
